@@ -16,6 +16,7 @@
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
@@ -1287,4 +1288,4 @@ module_usb_driver(rx666m_driver);
 MODULE_AUTHOR("Marcin Odrzywolski <emk6@wp.pl>");
 MODULE_DESCRIPTION("RX666m USB driver");
 MODULE_VERSION("v1.1");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");

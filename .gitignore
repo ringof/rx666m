@@ -6,3 +6,5 @@
 **/build
 Module.symvers
 modules.order
+.vscode/c_cpp_properties.json
+.vscode/settings.json
