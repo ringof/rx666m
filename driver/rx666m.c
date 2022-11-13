@@ -30,24 +30,22 @@
 #include <linux/uaccess.h>
 #include <linux/list.h>
 #include <linux/workqueue.h>
-
 #include <linux/kernel.h>
 #include <linux/time.h>
 
 #include "rx666m_ioctl.h"
 
-#define USB_CYPRESS_VENDOR_ID   				0x04b4
-#define USB_FX3_PRODUCT_ID      				0x00f3
-#define USB_RX666M_MINOR_BASE					193
-#define NUM_CONCURRENT_TRANSFERS  				16
-#define NUM_DATA_URB							NUM_CONCURRENT_TRANSFERS*256
-#define DATA_BUFFER_SIZE						(1024*4)
-#define USB_TYPE_OUT							0x40
-#define USB_TYPE_IN								0xC0
-#define RX666_TIMEOUT_MS						1000
-#define RX666_READ_TIMEOUT_S					5
-#define MAX_IOCTL_SIZE          				(2 * 1024)
-
+#define USB_CYPRESS_VENDOR_ID		0x04b4
+#define USB_FX3_PRODUCT_ID			0x00f3
+#define USB_RX666M_MINOR_BASE		193
+#define NUM_CONCURRENT_TRANSFERS  	16
+#define NUM_DATA_URB				NUM_CONCURRENT_TRANSFERS*256
+#define DATA_BUFFER_SIZE			(1024*4)
+#define USB_TYPE_OUT				0x40
+#define USB_TYPE_IN					0xC0
+#define RX666_TIMEOUT_MS			1000
+#define RX666_READ_TIMEOUT_S		5
+#define MAX_IOCTL_SIZE          	(2 * 1024)
 
 #define ANCHORURB	1
 #define DMA_EN		1
@@ -59,25 +57,23 @@
 typedef struct
 {
 	struct rx666m_device_s *dev;
-
     struct workqueue_struct * wq;
     struct delayed_work stats_dumper_work;
+
 } stats_dumper_priv_t;
 
 typedef struct
 {
 	struct list_head list;
-
     struct urb  *urb;
     void        *addr;
     dma_addr_t   dma;
 	size_t		 cnt;
 	__u32		 tv_sec;
 	__u32		 tv_usec;
-
 	int			taken;
-
 	struct rx666m_device_s* dev;
+
 }rx666m_data_buffer_t;
 
 typedef struct
@@ -90,65 +86,49 @@ typedef struct
 
 typedef struct rx666m_device_s
 {
-    struct usb_device    *udev;
-    struct usb_interface *interface;
-
-    int                   intnum;
-    int                   disconnecting;
-
-
-    int                   rx_en;
-    spinlock_t            data_in_lock;
-    wait_queue_head_t     data_in_wait;
-
-    atomic_t              data_in_ready;
-    atomic_t              data_in_use;
-    atomic_t              data_in_progress;
-
+    struct usb_device        *udev;
+    struct usb_interface     *interface;
+    int                      intnum;
+    int                      disconnecting;
+    int                      rx_en;
+    spinlock_t               data_in_lock;
+    wait_queue_head_t        data_in_wait;
+    atomic_t                 data_in_ready;
+    atomic_t                 data_in_use;
+    atomic_t                 data_in_progress;
 #if ANCHORURB
-    struct usb_anchor     data_in_anchor;
+    struct usb_anchor        data_in_anchor;
 #endif
-	struct list_head      data_in_bufs_avail;
-	struct list_head      data_in_bufs_busy;
-	struct list_head      data_in_bufs_ready;
-
-    struct file           *reader;
-
-	ktime_t ts_start, 	ts_end;
-	size_t			read_cb_cnt;
-	size_t			bad_status;
-	size_t			overrun;
-	size_t			submitted;
-	size_t			last_read_ret;
-
-
+	struct list_head         data_in_bufs_avail;
+	struct list_head         data_in_bufs_busy;
+	struct list_head         data_in_bufs_ready;
+    struct file              *reader;
+	ktime_t 			     ts_start;
+	ktime_t				     ts_end;
+	size_t			         read_cb_cnt;
+	size_t			         bad_status;
+	size_t			         overrun;
+	size_t			         submitted;
+	size_t			         last_read_ret;
 #if LOG_EN
-	stats_dumper_priv_t		stats_dumper_priv;
-
-	struct workqueue_struct *queue;
+	stats_dumper_priv_t		 stats_dumper_priv;
+	struct workqueue_struct  *queue;
 	rx666m_driver_snapshot_t *snapshot;
 #endif
 
 }rx666m_device_t;
 
-
 static void rx666m_read_cb(struct urb *urb);
-
-
-
 static struct usb_driver rx666m_driver;
 
 // USB PID-VID table
 static struct usb_device_id rx666m_table[] = {
+
     { USB_DEVICE(USB_CYPRESS_VENDOR_ID, USB_FX3_PRODUCT_ID) },
     { USB_DEVICE(USB_CYPRESS_VENDOR_ID, 0x00f1) },
     { } /* Terminate entry */
 };
 MODULE_DEVICE_TABLE(usb, rx666m_table);
-
-
-
-
 
 #if LOG_EN
 static void dump_info(rx666m_device_t *dev);
@@ -193,17 +173,13 @@ static inline const char* status2E(int status)
 		return errmsg;
 }
 
-
-
 void stats_dumper_work(struct work_struct * work_struct_ptr)
 {
     struct delayed_work * delayed = container_of(work_struct_ptr, struct delayed_work, work);
     stats_dumper_priv_t * priv = container_of(delayed, stats_dumper_priv_t, stats_dumper_work);
 
 	printk(KERN_INFO "rx666m stats_dumper_work:\n");
-
 	dump_info(priv->dev);
-
     queue_delayed_work(priv->wq, &priv->stats_dumper_work, LOG_PERIOD);
 }
 
@@ -253,13 +229,11 @@ static void dump_info(rx666m_device_t *dev)
 	list_for_each(p, &dev->data_in_bufs_busy)
 	{
 		dev->snapshot->busy_bufs[busy_cnt++] = list_entry(p, rx666m_data_buffer_t, list);
-
 	}
 
 	list_for_each(p, &dev->data_in_bufs_ready)
 	{
 		dev->snapshot->rdy_bufs[rdy_cnt++] = list_entry(p, rx666m_data_buffer_t, list);
-
 	}
 	spin_unlock_irqrestore(&dev->data_in_lock, irq_flags);
 
@@ -443,7 +417,6 @@ static void rx666m_read_cb(struct urb *urb)
 	 	case -ENODEV:
 	 	case -ESHUTDOWN:
 			return;
-
 		default:
 			break;
 	}
@@ -609,9 +582,7 @@ static int rx666m_start(rx666m_device_t *dev)
 static void rx666m_stop(rx666m_device_t *dev)
 {
 	struct list_head *p, *q;
-
 	rx666m_data_buffer_t *data_buf;
-
 
 	#if LOG_EN
 		stats_dumper_stop_workqueue( &dev->stats_dumper_priv );
@@ -632,9 +603,7 @@ static void rx666m_stop(rx666m_device_t *dev)
 		#endif
 
         usb_free_urb(data_buf->urb);
-
 		list_del(p);
-
 		kfree(data_buf);
     }
 
@@ -654,8 +623,9 @@ static int disable_rx(rx666m_device_t *dev)
 	RX666_INFO(&dev->interface->dev, "disabling rx\n");
 
     if (dev->intnum != 1)
-        return -1;
-
+	{
+		return -1;
+	}
 
     dev->rx_en = 0;
 
@@ -677,7 +647,6 @@ static int disable_rx(rx666m_device_t *dev)
     INIT_LIST_HEAD(&dev->data_in_bufs_busy);
     INIT_LIST_HEAD(&dev->data_in_bufs_ready);
 	spin_unlock_irqrestore(&dev->data_in_lock, flags);
-
 
 	RX666_INFO(&dev->interface->dev, "rx disabled\n");
 
@@ -873,7 +842,7 @@ long rx666m_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	rx666m_ioctl_write_ram_t arg_wr_ram;
 
     dev = file->private_data;
-    data = (void __user *)arg;
+	    data = (void __user *)arg;
 
     if (dev->disconnecting)
 	{
