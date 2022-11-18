@@ -8,3 +8,14 @@ Module.symvers
 modules.order
 .vscode/c_cpp_properties.json
 .vscode/settings.json
+usbmon_debug.mon
+driver/debugging-14NOV22
+.gitignore
+driver/install-notes
+driver/RX666.img
+.gitignore
+images/RX666m.img
+images/not_working/RX666m.img
+images/unknown/RX666.img
+images/working_nov15/RX666m.img
+images/working_nov16/rx666m.img
