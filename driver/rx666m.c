@@ -50,7 +50,7 @@
 #define ANCHORURB	1
 #define DMA_EN		1
 #define LOG_PERIOD 	(5*HZ)
-#define LOG_EN		0
+#define LOG_EN		1
 
 #define RX666_INFO dev_dbg 
 
@@ -955,7 +955,7 @@ long rx666m_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 				RX666_INFO(&dev->interface->dev, "RX666M_I2C_READ address=0x%x reg=0x%x len=0x%x", (int)tr_data->address, (int)tr_data->reg, (int)tr_data->len);
 
 				ret = usb_control_msg(dev->udev, usb_rcvctrlpipe(dev->udev, 0),
-						0xbe, 0xc0, tr_data->address, tr_data->reg,
+						0xaf, 0xc0, tr_data->address, tr_data->reg,
 						tr_data->data, tr_data->len, RX666_TIMEOUT_MS);
 				if(ret != tr_data->len)
 				{
@@ -996,7 +996,7 @@ long rx666m_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 				RX666_INFO(&dev->interface->dev, "RX666M_I2C_WRITE address=0x%x reg=0x%x len=0x%x", (int)tr_data->address, (int)tr_data->reg, (int)tr_data->len);
 
 				ret = usb_control_msg(dev->udev, usb_sndctrlpipe(dev->udev, 0),
-						0xba, 0x40, tr_data->address, tr_data->reg,
+						0xae, 0x40, tr_data->address, tr_data->reg,
 						tr_data->data, tr_data->len, RX666_TIMEOUT_MS);
 				if(ret != tr_data->len)
 				{
@@ -1028,7 +1028,7 @@ long rx666m_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 			buf[0]=arg;
 			ret = usb_control_msg(dev->udev, usb_sndctrlpipe(dev->udev, 0),
-					0xbc, 0x40, 0, 0,
+					0xad, 0x40, 0, 0,
 					buf, 1, RX666_TIMEOUT_MS);
 			if(ret != 1)
 			{
@@ -1120,6 +1120,7 @@ static int rx666m_release(struct inode *inode, struct file *file)
 
     return 0;
 }
+
 
 static char *rx666m_devnode(struct device *dev, umode_t *mode)
 {

@@ -36,14 +36,14 @@
 
 #define MAX_FWIMG_SIZE          (512 * 1024)
 
-#define GPIO_LED_RED	(1<<0)
+#define GPIO_LED_RED	 (1<<0)
 #define GPIO_LED_YELLOW (1<<1)
-#define GPIO_LED_BLUE	(1<<2)
-#define GPIO_SEL0		(1<<3)
-#define GPIO_SEL1		(1<<4)
-#define GPIO_SHDWN		(1<<5)
-#define GPIO_DITH		(1<<6)
-#define GPIO_RANDO		(1<<7)
+#define GPIO_LED_BLUE	 (1<<2)
+#define GPIO_SEL0	 (1<<3)
+#define GPIO_SEL1	 (1<<4)
+#define GPIO_SHDWN	 (1<<5)
+#define GPIO_DITH	 (1<<6)
+#define GPIO_RANDO	 (1<<7)
 
 #define GPIO_DEFAULT ( GPIO_LED_RED | GPIO_LED_YELLOW | GPIO_LED_BLUE | GPIO_SEL1 | 1*GPIO_DITH | 1*GPIO_RANDO)
 #define GPIO_DEFAULT_DC ( GPIO_LED_RED | GPIO_LED_YELLOW | GPIO_LED_BLUE | 1*GPIO_DITH | 1*GPIO_RANDO)
@@ -51,7 +51,7 @@
 #define IS_BIG_ENDIAN (*(uint16_t *)"\0\xff" < 0x100)
 
 static const char devName[] = "/dev/rx666m";
-static const char imagePath[]= "/usr/share/rx666m/RX666.img";
+static const char imagePath[]= "/usr/share/rx666m/RX666m.img";
 
 /* Array representing physical size of EEPROM corresponding to each size encoding. */
 const int i2c_eeprom_size[] =
@@ -206,9 +206,10 @@ int LowLevel::Init()
 			return r;
 
 		std::cerr << "Start firmware\n";
-		sleep(1);
+		sleep(10);
 		std::cerr << "Reopen dev\n";
 		CloseDev();
+                sleep(10);
 		r=OpenDev();
 		if(r<0)
 			return r;

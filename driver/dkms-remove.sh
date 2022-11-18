@@ -1,9 +1,7 @@
 #!/bin/bash
 
-
 DRV_NAME=rx666m
 DRV_VERSION=1.0
-
 
 if [[ $EUID -ne 0 ]];
 then

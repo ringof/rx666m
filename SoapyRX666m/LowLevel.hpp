@@ -41,7 +41,7 @@
 	#include "AGC.hpp"
 #endif
 
-const size_t	packet_size = 4096;
+const size_t packet_size = 4096;
 const double AD8331_MinGain = -3.0;
 const double AD8331_MaxGain = 45.0;
 const double ATTN1_Gain = -31.0;
@@ -49,8 +49,6 @@ const double ATTN2_Gain1 = -10.0;
 const double ATTN2_Gain2 = -20.0;
 const double totalGainMax = AD8331_MaxGain;
 const double totalGainMin = ATTN1_Gain + ATTN2_Gain2 + AD8331_MinGain;
-
-
 
 class LowLevel
 {
