@@ -206,10 +206,10 @@ int LowLevel::Init()
 			return r;
 
 		std::cerr << "Start firmware\n";
-		sleep(10);
+		sleep(5);
 		std::cerr << "Reopen dev\n";
 		CloseDev();
-                sleep(10);
+        sleep(5);
 		r=OpenDev();
 		if(r<0)
 			return r;
@@ -853,13 +853,6 @@ bool LowLevel::isVGAPresent()
 	return VGAPresent ? true : false;
 }
 
-/*bool LowLevel::isATTNPresent()
-{
-	if(!isRunning())
-		return false;
-
-	return (ATTNPresent == 1) ? true : false;
-}*/
 bool LowLevel::isATTNPresent()
 {
 	if(!isRunning())

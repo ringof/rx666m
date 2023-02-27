@@ -2,7 +2,7 @@
 
 IMAGE_NAME=RX666.img
 DRV_NAME=rx666m
-DRV_VERSION=1.0
+DRV_VERSION=1.1
 FILES="*.c Makefile dkms.conf ../common/rx666m_ioctl.h"
 
 if [ ! "x$1" = "x" ]

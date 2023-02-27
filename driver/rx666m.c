@@ -1041,7 +1041,7 @@ long rx666m_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			break;
 
 		case RX666M_START:
-			RX666_INFO(&dev->interface->dev, "RX666M_SART\n");
+			RX666_INFO(&dev->interface->dev, "RX666M_START\n");
 			retval = 0;
 
 			buf = (uint8_t*)kmalloc(MAX_IOCTL_SIZE, GFP_KERNEL);
